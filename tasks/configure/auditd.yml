@@ -93,6 +93,6 @@
   when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
   ansible.builtin.service: name=auditd state=restarted use=service
 
-- name: RMain | Configure | auditd | estarting Auditd service (Altlinux)
+- name: Main | Configure | auditd | Restarting Auditd service (Altlinux)
   when: ansible_os_family == 'Altlinux'
   ansible.builtin.command: 'service auditd restart'

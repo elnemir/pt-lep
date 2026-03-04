@@ -108,3 +108,40 @@
 - **Общий статус задачи**: Завершена
 - **Оставшиеся шаги**:
   - По запросу: перейти к P3-улучшениям и hardening inventory-практик.
+
+---
+
+## Задача: P3 hardening и cleanup качества
+- **Статус**: Завершена
+- **Описание**: Устранить оставшиеся findings: убрать чувствительные данные из inventory и закрыть мелкие проблемы качества в task-файлах.
+
+### Шаг 1. Подготовка
+- **Статус**: Завершена
+- **Описание**:
+  - Определены целевые файлы: `inventory/hosts`, `tasks/configure/auditd.yml`, `tasks/configure/rsyslogd.yml`.
+  - Определен план: sanitize inventory, правка typo, упрощение grep-check без shell-конвейеров.
+
+### Шаг 2. Реализация P3-фиксов
+- **Статус**: Завершена
+- **Описание**:
+  - [inventory/hosts](../inventory/hosts) заменен на sanitized template без реальных адресов.
+  - [vars/siem_agents.yml](../vars/siem_agents.yml) переведен на placeholder endpoint.
+  - [tasks/configure/auditd.yml](../tasks/configure/auditd.yml) исправлена опечатка в имени задачи.
+  - [tasks/configure/rsyslogd.yml](../tasks/configure/rsyslogd.yml) проверочные `grep`-шаги переведены с shell на `command` + `rc`.
+
+### Шаг 3. Актуализация review и документации
+- **Статус**: Завершена
+- **Описание**:
+  - Обновлен [docs/CODE_REVIEW.md](./CODE_REVIEW.md): оставшиеся findings закрыты.
+  - Актуализированы [docs/PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md), [docs/changelog.md](./changelog.md), [CHANGELOG.md](../CHANGELOG.md).
+
+### Шаг 4. Валидация
+- **Статус**: Завершена
+- **Описание**:
+  - Проверено отсутствие внутренних адресов формата `10.255.*` и `10.7.*` в репозитории.
+  - Попытка `ansible-playbook --syntax-check` по-прежнему недоступна из-за отсутствия `ansible-playbook` в окружении.
+
+### Текущий статус
+- **Общий статус задачи**: Завершена
+- **Оставшиеся шаги**:
+  - По запросу: перейти к инфраструктурному этапу (CI + ansible-lint + molecule smoke).

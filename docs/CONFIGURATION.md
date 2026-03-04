@@ -42,7 +42,7 @@
 ```yaml
 facilities:
   default:
-    - { address: '10.255.88.35', transport: 'udp', port: '514' }
+    - { address: 'mpxagent01.example.com', transport: 'udp', port: '514' }
 ```
 
 Выбор группы:

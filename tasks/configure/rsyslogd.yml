@@ -4,8 +4,15 @@
     file: siem_agents.yml
 
 - name: Main | Configure | rsyslogd | Checking IncludeConfig option
-  ansible.builtin.shell: /bin/grep --silent '^include(file="/etc/rsyslog.d/\*.conf"\|^$IncludeConfig /etc/rsyslog.d/\*.conf' "{{ rsyslog_config }}" && echo true || echo false
-  register: includeconfig_exists
+  ansible.builtin.command:
+    argv:
+      - /bin/grep
+      - -Eq
+      - '^include\(file="/etc/rsyslog.d/\*\.conf"\)|^\$IncludeConfig /etc/rsyslog.d/\*\.conf'
+      - "{{ rsyslog_config }}"
+  register: includeconfig_check
+  changed_when: false
+  failed_when: false
 
 - name: Main | Configure | rsyslogd | Inserting comment
   ansible.builtin.lineinfile:
@@ -15,7 +22,7 @@
     state: present
 
 - name: Main | Configure | rsyslogd | Adding IncludeConfig option
-  when: includeconfig_exists.stdout == 'false'
+  when: includeconfig_check.rc != 0
   ansible.builtin.lineinfile:
     dest: "{{ rsyslog_config }}"
     line: $IncludeConfig {{ rsyslog_siem_config }}
@@ -33,12 +40,19 @@
   with_items: "{{ rsyslog_options }}"
 
 - name: Main | Configure | rsyslogd | Checking if journald is used
-  ansible.builtin.shell: /bin/grep --silent '^module(load="imjournal"\|^$ModLoad imjournal' "{{ rsyslog_config }}" && echo true || echo false
-  register: journald_is_used
+  ansible.builtin.command:
+    argv:
+      - /bin/grep
+      - -Eq
+      - '^module\(load="imjournal"\)|^\$ModLoad imjournal'
+      - "{{ rsyslog_config }}"
+  register: journald_check
+  changed_when: false
+  failed_when: false
 
 
 - name: Main | Configure | rsyslogd | Setting up rsyslog options for journald
-  when: journald_is_used.stdout == 'true'
+  when: journald_check.rc == 0
   ansible.builtin.lineinfile:
     dest: "{{ rsyslog_config }}"
     regexp: "{{ item.regexp }}"
@@ -50,7 +64,7 @@
     - { regexp: '^$imjournalRatelimitInterval', line: '$imjournalRatelimitInterval 15' }
 
 - name: Main | Configure | rsyslogd | Setting up rsyslog additional options
-  when: journald_is_used.stdout == 'false'
+  when: journald_check.rc != 0
   ansible.builtin.lineinfile:
     dest: "{{ rsyslog_config }}"
     regexp: "{{ item.regexp }}"
@@ -75,7 +89,7 @@
     state: restarted
 
 - name: Main | Configure | rsyslogd | Restarting journald service
-  when: journald_is_used.stdout == 'true' or ansible_os_family == 'Altlinux'
+  when: journald_check.rc == 0 or ansible_os_family == 'Altlinux'
   ansible.builtin.service:
     name: systemd-journald
     state: restarted

@@ -102,7 +102,7 @@ ansible-playbook playbook.yml --tags "install,auditd"
 
 ## 6. Важные замечания
 
-- В [inventory/hosts](inventory/hosts) содержатся реальные адреса хостов, файл нужно считать чувствительным.
+- [inventory/hosts](inventory/hosts) в репозитории является sanitized-шаблоном. Для реального контура используйте отдельный приватный inventory-файл.
+- В [vars/siem_agents.yml](vars/siem_agents.yml) по умолчанию указан placeholder (`mpxagent01.example.com`), задайте реальные адреса SIEM-агентов перед production-запуском.
 - `ansible.cfg` задает `roles_path = ../`; для запуска убедитесь, что имя роли и путь в окружении соответствуют этому layout.
 - Перед запуском в production проверьте раздел "Риски и техдолг" в [docs/PROJECT_ANALYSIS.md](docs/PROJECT_ANALYSIS.md).
-

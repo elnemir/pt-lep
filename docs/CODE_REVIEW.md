@@ -34,27 +34,22 @@
   - переход на числовой `auditd_major_version` для audispd ветвления;
   - переход на `version` test после нормализации версии в install-with-repos ветке.
 
+### P3-1) В inventory присутствовали внутренние IP/hostnames
+- Исправлено в [inventory/hosts](../inventory/hosts#L1):
+  - inventory заменен на sanitized template без внутренних адресов;
+  - добавлен безопасный default `localhost` для локального запуска.
+- Дополнительно санитизирован default SIEM endpoint в [vars/siem_agents.yml](../vars/siem_agents.yml#L18) (`mpxagent01.example.com`).
+
+### P3-2) Мелкие проблемы качества в task-файлах
+- Исправлено:
+  - [tasks/configure/auditd.yml](../tasks/configure/auditd.yml#L96): исправлена опечатка в названии задачи;
+  - [tasks/configure/rsyslogd.yml](../tasks/configure/rsyslogd.yml#L6): shell-конвейеры в grep-проверках заменены на `command` + `rc` (`failed_when: false`, `changed_when: false`).
+
 ## Открытые findings
 
-## P2
-
-### 1) В inventory присутствуют внутренние IP/hostnames
-- Файл: [inventory/hosts](../inventory/hosts#L31)
-- Детали:
-  - в репозитории хранится production-подобный список хостов.
-- Риск:
-  - повышенный риск утечки инфраструктурных данных.
-
-## P3
-
-### 4) Небольшие проблемы качества и поддерживаемости
-- Файлы:
-  - [tasks/configure/auditd.yml](../tasks/configure/auditd.yml#L96) (опечатка в названии задачи)
-  - [tasks/configure/rsyslogd.yml](../tasks/configure/rsyslogd.yml#L7) (сложные shell/grep выражения)
-- Риск:
-  - ухудшение читаемости и сопровождения, но без прямого функционального блокера.
+Открытых findings в рамках текущего review-списка не осталось.
 
 ## Рекомендованный порядок исправления (оставшееся)
 
-1. Вынести production inventory в отдельный закрытый контур.
-2. Исправить мелкие проблемы качества (`task name typo`, сложные grep-условия).
+1. Добавить CI-контур (`ansible-lint`, syntax-check, smoke-run) и закрепить его как обязательный gate.
+2. Вынести повторяющуюся install-логику в переиспользуемые блоки и сократить shell-heavy участки.

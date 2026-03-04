@@ -29,3 +29,8 @@
 - Строковые сравнения версий auditd заменены на безопасные сравнения:
   - [tasks/configure/audispd-plugins.yml](tasks/configure/audispd-plugins.yml)
   - [tasks/install/with_repos/auditd.yml](tasks/install/with_repos/auditd.yml)
+- Inventory в репозитории санитизирован до шаблона без внутренних адресов: [inventory/hosts](inventory/hosts).
+- Default SIEM endpoint в репозитории заменен на placeholder: [vars/siem_agents.yml](vars/siem_agents.yml).
+- Закрыты мелкие проблемы качества:
+  - [tasks/configure/auditd.yml](tasks/configure/auditd.yml) (исправлена опечатка в task name)
+  - [tasks/configure/rsyslogd.yml](tasks/configure/rsyslogd.yml) (упрощены grep-checks без shell-конвейеров)

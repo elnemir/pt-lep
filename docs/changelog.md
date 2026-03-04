@@ -3,6 +3,14 @@
 ## 2026-03-04
 
 ### Изменено
+- Запущен цикл P3 hardening и cleanup:
+  - удаление чувствительных данных из inventory;
+  - закрытие мелких quality-замечаний в task-файлах.
+- Реализованы P3-фиксы:
+  - [inventory/hosts](../inventory/hosts) заменен на sanitized template (без внутренних адресов);
+  - [vars/siem_agents.yml](../vars/siem_agents.yml) переведен на placeholder endpoint;
+  - [tasks/configure/auditd.yml](../tasks/configure/auditd.yml) исправлена опечатка в имени задачи;
+  - [tasks/configure/rsyslogd.yml](../tasks/configure/rsyslogd.yml) проверки `grep` переведены с shell-конвейеров на `command` + анализ `rc`.
 - Запущен цикл исправления P2-замечаний из [docs/CODE_REVIEW.md](./CODE_REVIEW.md):
   - перевод выбора syslog-демона на детерминированную логику;
   - устранение строкового сравнения версий auditd.
