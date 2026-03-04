@@ -9,7 +9,7 @@
     
     - name: Main | install | with_repos | audispd-plugins | Trying to install audispd-plugins from repo (RHEL-based)
       when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
-      ansible.builtin.yum:
+      ansible.builtin.package:
         name: audispd-plugins
         state: latest
 

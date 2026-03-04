@@ -70,14 +70,14 @@ syslog_ng_siem_config: /etc/syslog-ng/10-siem.conf
 
 # Supported Linux distributions
 linux_supported:
-  - { name: 'RedHat', min_ver: 7, max_ver: 8 }
-  - { name: 'CentOS', min_ver: 7, max_ver: 8 }
-  - { name: 'OracleLinux', min_ver: 7, max_ver: 8 }
-  - { name: 'Debian', min_ver: 9, max_ver: 12 }
+  - { name: 'RedHat', min_ver: 7, max_ver: 9 }
+  - { name: 'CentOS', min_ver: 7, max_ver: 9 }
+  - { name: 'OracleLinux', min_ver: 7, max_ver: 9 }
+  - { name: 'Debian', min_ver: 6, max_ver: 12 }
   - { name: 'Ubuntu', min_ver: 16, max_ver: 24 }
   - { name: 'Astra Linux', min_ver: 1, max_ver: 1 }
-  - { name: 'REDOS', min_ver: 7, max_ver: 7 }
-  - { name: 'RED', min_ver: 7, max_ver: 7 }
+  - { name: 'REDOS', min_ver: 7, max_ver: 9 }
+  - { name: 'RED', min_ver: 7, max_ver: 9 }
   - { name: 'Altlinux', min_ver: 10, max_ver: 10 }
 
 
@@ -90,6 +90,8 @@ ubuntu1604_auditd_packages:
 
 
 packages_dirs:
+  # Offline packages are available for a subset of supported OS versions.
+  # For other supported versions use repository installation mode.
   rpm:
     - { dist: 'CentOS', ver: '7', dir_name: 'centos7' }
     - { dist: 'CentOS', ver: '8', dir_name: 'centos8' }

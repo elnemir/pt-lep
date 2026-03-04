@@ -9,7 +9,7 @@
     
     - name: Main | install | with_repos | rsyslogd | Trying to install rsyslog from repo (RHEL-based)
       when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
-      ansible.builtin.yum:
+      ansible.builtin.package:
         name: rsyslog
         state: latest
     

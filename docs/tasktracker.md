@@ -145,3 +145,48 @@
 - **Общий статус задачи**: Завершена
 - **Оставшиеся шаги**:
   - По запросу: перейти к инфраструктурному этапу (CI + ansible-lint + molecule smoke).
+
+---
+
+## Задача: Расширение поддержки ОС (Debian 6.0 ... RedOS 9.0)
+- **Статус**: Завершена
+- **Описание**: Расширить поддерживаемые версии ОС с акцентом на Debian 6.x и RedOS 9.x, сохранив корректное поведение online/offline установки.
+
+### Шаг 1. Подготовка
+- **Статус**: Завершена
+- **Описание**:
+  - Определены целевые файлы: `vars/main.yml`, `tasks/install/with_repos/*.yml`, `tasks/install/without_repos/*.yml`.
+  - Выбрана стратегия:
+    - расширить `linux_supported`;
+    - сделать RHEL/REDOS установку репозиторного режима package-manager-agnostic;
+    - добавить явную проверку наличия офлайн-пакетов для текущей ОС, чтобы корректно обрабатывать версии без локальных пакетов.
+
+### Шаг 2. Реализация расширения поддержки
+- **Статус**: Завершена
+- **Описание**:
+  - Расширен список поддерживаемых ОС в [vars/main.yml](../vars/main.yml):
+    - RedHat/CentOS/OracleLinux: `7..9`;
+    - Debian: `6..12`;
+    - REDOS/RED: `7..9`.
+  - Репозиторная установка для RHEL-like переведена на `ansible.builtin.package`:
+    - [tasks/install/with_repos/system-wide.yml](../tasks/install/with_repos/system-wide.yml)
+    - [tasks/install/with_repos/auditd.yml](../tasks/install/with_repos/auditd.yml)
+    - [tasks/install/with_repos/audispd-plugins.yml](../tasks/install/with_repos/audispd-plugins.yml)
+    - [tasks/install/with_repos/rsyslogd.yml](../tasks/install/with_repos/rsyslogd.yml)
+  - В offline-ветках добавлена явная валидация mapping и наличия локальных пакетов, а RPM-установка стала поддерживать `dnf/yum`:
+    - [tasks/install/without_repos/audit.yml](../tasks/install/without_repos/audit.yml)
+    - [tasks/install/without_repos/audispd-plugins.yml](../tasks/install/without_repos/audispd-plugins.yml)
+    - [tasks/install/without_repos/rsyslog.yml](../tasks/install/without_repos/rsyslog.yml)
+    - [tasks/install/without_repos/misc.yml](../tasks/install/without_repos/misc.yml)
+
+### Шаг 3. Актуализация документации и валидация
+- **Статус**: Завершена
+- **Описание**:
+  - Обновлены [README.md](../README.md), [docs/CONFIGURATION.md](./CONFIGURATION.md), [docs/PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md), [CHANGELOG.md](../CHANGELOG.md), [docs/changelog.md](./changelog.md).
+  - Проверена структура обновленных YAML-файлов и отсутствие устаревших yum-only репозиторных вызовов.
+  - Попытка `ansible-playbook --syntax-check` недоступна в окружении из-за отсутствия `ansible-playbook`.
+
+### Текущий статус
+- **Общий статус задачи**: Завершена
+- **Оставшиеся шаги**:
+  - По запросу: добавить CI-проверки (`ansible-lint`, syntax-check, smoke inventory).

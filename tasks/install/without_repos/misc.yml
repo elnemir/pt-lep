@@ -7,20 +7,39 @@
         state: directory
         prefix: pkgs_misc_
       register: tmp_dir
-    
-    - name: Main | install | without_repos | misc | Uploading misc packages 
-      when:
-        - ansible_distribution == item.dist
-        - ansible_distribution_major_version == item.ver
+
+    - name: Main | install | without_repos | misc | Resolving package directory (RHEL-based)
+      ansible.builtin.set_fact:
+        misc_rpm_dir: "{{ (packages_dirs.rpm | selectattr('dist', 'equalto', ansible_distribution) | selectattr('ver', 'equalto', ansible_distribution_major_version) | map(attribute='dir_name') | list | first | default('')) }}"
+
+    - name: Main | install | without_repos | misc | Verifying package directory mapping (RHEL-based)
+      ansible.builtin.assert:
+        that:
+          - misc_rpm_dir | length > 0
+        fail_msg: "No offline misc package mapping for {{ ansible_distribution }} {{ ansible_distribution_major_version }}. Use repository installation or add local packages."
+
+    - name: Main | install | without_repos | misc | Uploading misc packages
       ansible.builtin.copy:
-        src: "files/packages/{{ item.dir_name }}/misc/"
+        src: "files/packages/{{ misc_rpm_dir }}/misc/"
         dest: "{{ tmp_dir.path }}/"
         mode: '0700'
-      with_items: "{{ packages_dirs.rpm }}"
-    
+
+    - name: Main | install | without_repos | misc | Checking uploaded rpm packages
+      ansible.builtin.find:
+        paths: "{{ tmp_dir.path }}"
+        patterns: "*.rpm"
+        file_type: file
+      register: misc_rpm_files
+
+    - name: Main | install | without_repos | misc | Verifying rpm package presence
+      ansible.builtin.assert:
+        that:
+          - misc_rpm_files.matched | int > 0
+        fail_msg: "No local rpm files found for misc installation in {{ tmp_dir.path }}."
+
     - name: Main | install | without_repos | misc | Installing packages via rpm
-      ansible.builtin.shell: "/usr/bin/yum -y install {{ tmp_dir.path }}/*.rpm"
-      
+      ansible.builtin.shell: "{{ 'dnf' if ansible_pkg_mgr in ['dnf', 'dnf5'] else 'yum' }} -y install {{ tmp_dir.path }}/*.rpm"
+
     - name: Main | install | without_repos | misc | Cleaning temporary directory
       ansible.builtin.file:
         path: "{{ tmp_dir.path }}/"
@@ -34,22 +53,41 @@
         state: directory
         prefix: pkgs_misc_
       register: tmp_dir
-    
+
+    - name: Main | install | without_repos | misc | Resolving package directory (Deb-based)
+      ansible.builtin.set_fact:
+        misc_deb_dir: "{{ (packages_dirs.deb | selectattr('dist', 'equalto', ansible_distribution) | selectattr('ver', 'equalto', ansible_distribution_release) | map(attribute='dir_name') | list | first | default('')) }}"
+
+    - name: Main | install | without_repos | misc | Verifying package directory mapping (Deb-based)
+      ansible.builtin.assert:
+        that:
+          - misc_deb_dir | length > 0
+        fail_msg: "No offline misc package mapping for {{ ansible_distribution }} {{ ansible_distribution_release }}. Use repository installation or add local packages."
+
     - name: Main | install | without_repos | misc | Uploading misc packages
-      when:
-        - ansible_distribution == item.dist
-        - ansible_distribution_release == item.ver
       ansible.builtin.copy:
-        src: "files/packages/{{ item.dir_name }}/misc/"
+        src: "files/packages/{{ misc_deb_dir }}/misc/"
         dest: "{{ tmp_dir.path }}/"
         mode: '0700'
-      with_items: "{{ packages_dirs.deb }}"
-    
+
+    - name: Main | install | without_repos | misc | Checking uploaded deb packages
+      ansible.builtin.find:
+        paths: "{{ tmp_dir.path }}"
+        patterns: "*.deb"
+        file_type: file
+      register: misc_deb_files
+
+    - name: Main | install | without_repos | misc | Verifying deb package presence
+      ansible.builtin.assert:
+        that:
+          - misc_deb_files.matched | int > 0
+        fail_msg: "No local deb files found for misc installation in {{ tmp_dir.path }}."
+
     - name: Main | install | without_repos | misc | Installing packages via apt
       environment:
         PATH: /usr/sbin:/sbin:{{ ansible_env.PATH }}
       ansible.builtin.shell: "/usr/bin/yes | /usr/bin/dpkg --install {{ tmp_dir.path }}/*.deb"
-      
+
     - name: Main | install | without_repos | misc | Cleaning temporary directory
       ansible.builtin.file:
         path: "{{ tmp_dir.path }}/"

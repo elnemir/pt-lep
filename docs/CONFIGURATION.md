@@ -71,15 +71,18 @@ facilities:
 
 Источник: `linux_supported` из [vars/main.yml](../vars/main.yml)
 
-- RedHat 7-8
-- CentOS 7-8
-- OracleLinux 7-8
-- Debian 9-12
+- RedHat 7-9
+- CentOS 7-9
+- OracleLinux 7-9
+- Debian 6-12
 - Ubuntu 16-24
 - Astra Linux 1
-- REDOS 7
-- RED 7
+- REDOS 7-9
+- RED 7-9
 - Altlinux 10
+
+Примечание:
+- Локальные офлайн-пакеты в `files/packages` доступны только для части версий; при отсутствии mapping роль потребует установку из репозиториев или добавление локального пакета для конкретной версии.
 
 ## 7. Переопределение переменных
 
