@@ -3,6 +3,13 @@
 ## 2026-03-04
 
 ### Изменено
+- Запущен цикл исправления P2-замечаний из [docs/CODE_REVIEW.md](./CODE_REVIEW.md):
+  - перевод выбора syslog-демона на детерминированную логику;
+  - устранение строкового сравнения версий auditd.
+- Реализованы P2-фиксы:
+  - обновлен [tasks/configure/syslog.yml](../tasks/configure/syslog.yml): выбор syslog-демона через `service_facts` и детерминированные правила;
+  - обновлен [tasks/configure/audispd-plugins.yml](../tasks/configure/audispd-plugins.yml): ветвление по числовому `auditd_major_version`;
+  - обновлен [tasks/install/with_repos/auditd.yml](../tasks/install/with_repos/auditd.yml): нормализация версии и сравнение через `version` test.
 - Запущен цикл исправления P1-замечаний из [docs/CODE_REVIEW.md](./CODE_REVIEW.md):
   - корректировка mapping офлайн-пакетов для REDOS/RED;
   - повышение надежности `without_repos` установки с явной валидацией результатов.

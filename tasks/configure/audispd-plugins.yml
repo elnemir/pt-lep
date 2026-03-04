@@ -1,10 +1,15 @@
 ---
 - name: Main | Configure | audispd-plugins | Getting Auditd version
-  ansible.builtin.shell: out=$(/sbin/auditctl -v) && echo ${out} | /usr/bin/cut --delimiter " " --fields 3
+  ansible.builtin.command: /sbin/auditctl -v
   register: auditd_installed_ver
+  changed_when: false
+
+- name: Main | Configure | audispd-plugins | Parsing Auditd major version
+  ansible.builtin.set_fact:
+    auditd_major_version: "{{ (auditd_installed_ver.stdout | regex_search('([0-9]+)') | default('0')) | int }}"
 
 - name: Main | Configure | audispd-plugins | Modifying audispd-plugins config file (Auditd v2)
-  when: auditd_installed_ver.stdout < '3'
+  when: auditd_major_version < 3
   ansible.builtin.lineinfile:
     path: "{{ audispd_plugin_config_v2 }}"
     regexp: "{{ item.regexp }}"
@@ -14,7 +19,7 @@
     - { regexp: '^args', line: 'args = LOG_LOCAL6' }
 
 - name: Main | Configure | audispd-plugins | Modifying audispd-plugins config file (Auditd v3)
-  when: auditd_installed_ver.stdout >= '3.0'
+  when: auditd_major_version >= 3
   ansible.builtin.lineinfile:
     path: "{{ audispd_plugin_config_v3 }}"
     regexp: "{{ item.regexp }}"

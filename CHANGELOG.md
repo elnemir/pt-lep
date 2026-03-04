@@ -25,3 +25,7 @@
   - [tasks/install/without_repos/rsyslog.yml](tasks/install/without_repos/rsyslog.yml)
   - [tasks/install/without_repos/misc.yml](tasks/install/without_repos/misc.yml)
 - Добавлены post-install проверки пакетов и проверка доступности бинарников в offline-ветках установки.
+- Выбор syslog-демона переведен на детерминированную логику через `service_facts` в [tasks/configure/syslog.yml](tasks/configure/syslog.yml).
+- Строковые сравнения версий auditd заменены на безопасные сравнения:
+  - [tasks/configure/audispd-plugins.yml](tasks/configure/audispd-plugins.yml)
+  - [tasks/install/with_repos/auditd.yml](tasks/install/with_repos/auditd.yml)

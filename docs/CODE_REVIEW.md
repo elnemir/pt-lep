@@ -20,26 +20,25 @@
   - добавлены post-install проверки через `package_facts` + `assert`;
   - добавлены проверки бинарников (`auditctl -v`, `rsyslogd -v`, `tar --version`).
 
+### P2-1) Определение syslog-демона зависело только от запущенного процесса
+- Исправлено в [tasks/configure/syslog.yml](../tasks/configure/syslog.yml#L2):
+  - удален `pgrep`-подход;
+  - добавлен выбор по `service_facts` с детерминированными правилами;
+  - fallback на установку `rsyslog` сохранен при отсутствии обнаруженных сервисов.
+
+### P2-2) Строковые сравнения версий Auditd
+- Исправлено:
+  - [tasks/configure/audispd-plugins.yml](../tasks/configure/audispd-plugins.yml#L2)
+  - [tasks/install/with_repos/auditd.yml](../tasks/install/with_repos/auditd.yml#L27)
+- Что сделано:
+  - переход на числовой `auditd_major_version` для audispd ветвления;
+  - переход на `version` test после нормализации версии в install-with-repos ветке.
+
 ## Открытые findings
 
 ## P2
 
-### 1) Определение syslog-демона зависит только от запущенного процесса
-- Файл: [tasks/configure/syslog.yml](../tasks/configure/syslog.yml#L2)
-- Детали:
-  - используется `pgrep` по активному процессу.
-  - если демон установлен, но остановлен, логика переключается на установку `rsyslog`.
-- Риск:
-  - возможная смена/дублирование syslog-стека вопреки ожиданиям.
-
-### 2) Строковые сравнения версий Auditd
-- Файл: [tasks/configure/audispd-plugins.yml](../tasks/configure/audispd-plugins.yml#L7)
-- Детали:
-  - условия вида `< '3'` и `>= '3.0'` завязаны на строковое сравнение.
-- Риск:
-  - некорректное ветвление при нестандартном формате версии.
-
-### 3) В inventory присутствуют внутренние IP/hostnames
+### 1) В inventory присутствуют внутренние IP/hostnames
 - Файл: [inventory/hosts](../inventory/hosts#L31)
 - Детали:
   - в репозитории хранится production-подобный список хостов.
@@ -57,7 +56,5 @@
 
 ## Рекомендованный порядок исправления (оставшееся)
 
-1. Сделать детерминированный выбор syslog-демона (по service/package facts, а не только по pgrep).
-2. Привести сравнение версий к числовому/нормализованному формату.
-3. Вынести production inventory в отдельный закрытый контур.
-4. Исправить мелкие проблемы качества (`task name typo`, сложные grep-условия).
+1. Вынести production inventory в отдельный закрытый контур.
+2. Исправить мелкие проблемы качества (`task name typo`, сложные grep-условия).

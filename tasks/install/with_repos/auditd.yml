@@ -24,14 +24,19 @@
         msg: Auditd package is not available in the repositories
 
 - name: Main | install | with_repos | auditd | Getting Auditd version
-  ansible.builtin.shell: out=$(/sbin/auditctl -v) && echo ${out} | /usr/bin/cut --delimiter " " --fields 3
+  ansible.builtin.command: /sbin/auditctl -v
   register: auditd_installed_ver
   ignore_errors: yes
   no_log: yes
+  changed_when: false
+
+- name: Main | install | with_repos | auditd | Parsing Auditd version
+  ansible.builtin.set_fact:
+    auditd_installed_ver_normalized: "{{ auditd_installed_ver.stdout | regex_search('([0-9]+\\.[0-9]+(\\.[0-9]+)?)') | default('0.0') }}"
 
 - name: Main | install | with_repos | auditd | Reinstalling Auditd to the supported version
   when:
-    - auditd_installed_ver.stdout <= '2.6'
+    - auditd_installed_ver_normalized is version('2.6', '<=')
     - ansible_distribution == 'Ubuntu'
     - ansible_distribution_release == 'xenial'
   block:
@@ -65,6 +70,6 @@
 - ansible.builtin.fail:
    msg: Auditd version is too old. Install manually a version not older than 2.6.
   when:
-    - auditd_installed_ver.stdout <='2.6'
+    - auditd_installed_ver_normalized is version('2.6', '<=')
     - not ansible_distribution == 'Ubuntu'
     - not ansible_distribution_release == 'xenial'
