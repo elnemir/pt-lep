@@ -1,0 +1,29 @@
+---
+- name: Main | install | with_repos | audispd-plugins | Trying to install audispd-plugins from repo 
+  block:
+    - name: Trying to install audispd-plugins from repo (Deb-based)
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.apt:
+        name: audispd-plugins
+        state: latest
+    
+    - name: Main | install | with_repos | audispd-plugins | Trying to install audispd-plugins from repo (RHEL-based)
+      when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+      ansible.builtin.yum:
+        name: audispd-plugins
+        state: latest
+
+    - name: Main | install | with_repos | audispd-plugins | Trying to install audispd-plugins from repo
+      when: ansible_os_family == 'Altlinux'
+      ansible.builtin.debug:
+        msg: "AltLinux detected. No audispd require"
+
+  rescue:
+    - name: Main | install | with_repos | audispd-plugins | Installing audispd-plugins without repos
+      when: upload_local_packages 
+      ansible.builtin.include_tasks: install/without_repos/audispd-plugins.yml
+
+    - name: Main | install | with_repos | audispd-plugins | Fail if package is not available
+      when: not upload_local_packages
+      ansible.builtin.fail:
+        msg: audispd-plugins package is not available in the repositories

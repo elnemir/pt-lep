@@ -1,0 +1,54 @@
+---
+# !!! DON'T CHANGE THIS unless you know exactly what you do !!!
+- name: Main | Configure | system-wide | Modifying /etc/hosts file
+  when: modify_etc_hosts
+  block:
+    - name: Main | Configure | system-wide | Commenting localhost in /etc/hosts
+      ansible.builtin.replace:
+        path: /etc/hosts
+        regexp: '^(127.*)$'
+        replace: '###SIEM### \1'
+
+    - name: Main | Configure | system-wide | Checking host utility
+      ansible.builtin.shell: /usr/bin/host -V 2>/dev/null && echo true || echo false
+      register: host_util_exists
+
+    - name: Main | Configure | system-wide | Getting hostname
+      block:
+        - name: Main | Configure | system-wide | Getting short hostname
+          ansible.builtin.shell: /bin/hostname --short
+          register: out
+
+        - ansible.builtin.set_fact:
+            hostname_short: "{{ out.stdout }}"
+
+        - name: Main | Configure | system-wide | Getting FQDN hostname
+          ansible.builtin.shell: /bin/hostname --fqdn
+          register: out
+
+        - ansible.builtin.set_fact:
+            hostname_fqdn: "{{ out.stdout }}"
+
+    - name: Main | Configure | system-wide | Getting IP address (host)
+      when: host_util_exists.stdout == 'true'
+      block:
+        - ansible.builtin.shell: /usr/bin/host "{{ hostname_fqdn }}" | /usr/bin/awk '{print $4}'
+          register: out
+
+        - ansible.builtin.set_fact:
+            ip_address: "{{ out.stdout }}"
+
+    - name: Main | Configure | system-wide | Getting IP address (getent)
+      when: host_util_exists.stdout == 'false'
+      block:
+        - ansible.builtin.shell: /usr/bin/getent hosts "{{ hostname_fqdn }}" | /usr/bin/awk '{print $1}'
+          register: out
+
+        - ansible.builtin.set_fact:
+            ip_address: "{{ out.stdout }}"
+
+    - name: Main | Configure | system-wide | Insert self addresses in /etc/hosts
+      ansible.builtin.lineinfile:
+        dest: /etc/hosts
+        line: "{{ ip_address }} {{ hostname_fqdn }} {{ hostname_short }}"
+        state: present

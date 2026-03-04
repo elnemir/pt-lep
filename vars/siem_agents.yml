@@ -1,0 +1,34 @@
+---
+###################################################################################################
+### Target SIEM agent(s) configuration
+###################################################################################################
+# In this configuration file, one or several agents can be configured to which system events 
+# messages will be sent.
+# 
+# Multiple agent groups can also be configured. Each group of agents -- facility, can be applied to 
+# different hosts or groups of hosts. The host group and facilities matching is defined in the 
+# inventory file: ./host. 
+# 
+# If no specific facility is defined for a host or a hosts group in the inventory file (./hosts), 
+# then the "default" facility will be used.
+# 
+
+# DON'T change the next line!
+facilities:
+
+# Default agent
+  default:
+    - { address: '10.255.88.35', transport: 'udp', port: '514' }
+    # - { address: 'mpxagent01.example.com', transport: 'udp', port: '514' }
+
+### Examples
+#  default:
+#    - { address: 'mpxagent01.example.com', transport: 'udp', port: '514' }
+#    - { address: 'mpxagent02.example.com', transport: 'udp', port: '514' }
+#
+#  tatooine:
+#    - { address: 'mpxagent01.alpha.example.com', transport: 'udp', port: '514' }
+#    - { address: 'mpxagent01.beta.example.com', transport: 'tcp', port: '514' }
+#
+#  coruscant:
+#    - { address: 'mpxagent03.example.com', transport: 'udp', port: '21514' }

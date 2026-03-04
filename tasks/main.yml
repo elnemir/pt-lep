@@ -1,0 +1,71 @@
+---
+- name: Main | Checking Linux distribution version
+  when:
+    - ansible_distribution == item.name
+    - ansible_distribution_major_version | regex_search('^([0-9]+)') | int >= item.min_ver
+    - ansible_distribution_major_version | regex_search('^([0-9]+)') | int <= item.max_ver
+  with_items: "{{ linux_supported }}"
+  ansible.builtin.set_fact:
+    supported: yes
+
+- ansible.builtin.fail:
+    msg: Linux distribution "{{ ansible_distribution }} {{ ansible_distribution_major_version }}" is not supported
+  when: supported is undefined
+
+- name: Main | Configuring system-wide parameters
+  become: yes
+  ansible.builtin.import_tasks: configure/system-wide.yml
+  tags:
+    - configure
+    - pt
+    - system
+
+- name: Main | Installing additional software
+  become: yes
+  ansible.builtin.import_tasks: install/with_repos/system-wide.yml
+  tags:
+    - install
+    - pt
+    - system
+
+- name: Main | Installing Auditd
+  become: yes
+  ansible.builtin.import_tasks: install/with_repos/auditd.yml
+  tags:
+    - install
+    - pt
+    - auditd
+
+- name: Main | Configuring Auditd
+  become: yes
+  ansible.builtin.import_tasks: configure/auditd.yml
+  tags:
+    - configure
+    - pt
+    - auditd
+
+- name: Main | Installing audispd-plugins
+  become: yes
+  ansible.builtin.import_tasks: install/with_repos/audispd-plugins.yml
+  tags:
+    - install
+    - pt
+    - auditd
+    - syslog
+
+- name: Main | Configuring audispd-plugins
+  become: yes
+  ansible.builtin.import_tasks: configure/audispd-plugins.yml
+  tags:
+    - configure
+    - pt
+    - auditd
+    - syslog
+
+- name: Main | Configuring syslog
+  become: yes
+  ansible.builtin.import_tasks: configure/syslog.yml
+  tags:
+    - configure
+    - pt
+    - syslog

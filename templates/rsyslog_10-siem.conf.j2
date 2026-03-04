@@ -1,0 +1,29 @@
+{% for agent in facilities.get(facility) %}
+{% if agent.transport == 'udp' %}
+if ($syslogfacility-text == "local6" or $syslogpriority-text == "info") and not re_match($syslogfacility-text,"(mail|lpr|news|uucp|cron)") then {
+    action(
+        type="omfwd" name="pt_linux_audit"
+        protocol="udp" target="{{ agent.address }}" port="{{ agent.port }}"
+        action.repeatedmsgcontainsoriginalmsg="off"
+    )
+}
+{% else %}
+if ($syslogfacility-text == "local6" or $syslogpriority-text == "info") and not re_match($syslogfacility-text,"(mail|lpr|news|uucp|cron)") then {
+    action(
+        type="omfwd" name="pt_linux_audit"
+        protocol="tcp" target="{{ agent.address }}" port="{{ agent.port }}"
+        action.repeatedmsgcontainsoriginalmsg="off"
+        action.resumeRetryCount="-1"
+        queue.type="LinkedList"
+        queue.filename="syslog_queue"
+        queue.saveOnShutdown="on"
+        queue.maxDiskSpace="1024m"
+        queue.timeoutEnqueue="0"
+    )
+}
+{% endif %}
+{% endfor %}
+
+{% if not auditd_write_logs|bool %}
+local6.* stop
+{% endif %}

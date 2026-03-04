@@ -1,0 +1,59 @@
+---
+- name: Main | install | without_repos | audispd-plugins | Installing audispd-plugins without repositories (RHEL-based)
+  when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+  block:
+    - name: Main | install | without_repos | audispd-plugins | Creating temporary directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: pkgs_audispd-plugins_
+      register: tmp_dir
+    
+    - name: Main | install | without_repos | audispd-plugins | Uploading audispd-plugins package
+      when:
+        - ansible_distribution == item.dist
+        - ansible_distribution_major_version == item.ver 
+      ansible.builtin.copy:
+        src: "files/packages/{{ item.dir_name }}/audispd-plugins/"
+        dest: "{{ tmp_dir.path }}/"
+        mode: '0700'
+      with_items: "{{ packages_dirs.rpm }}"
+    
+    - name: Main | install | without_repos | audispd-plugins | Installing packages via rpm
+      ansible.builtin.shell: "/usr/bin/yum -y install {{ tmp_dir.path }}/*.rpm"
+      ignore_errors: True
+      
+    - name: Main | install | without_repos | audispd-plugins | Cleaning temporary directory
+      ansible.builtin.file:
+        path: "{{ tmp_dir.path }}/"
+        state: absent
+
+- name: Main | install | without_repos | audispd-plugins | Installing audispd-plugins without repositories (Deb-based)
+  when: ansible_os_family == 'Debian'
+  block:
+    - name: Main | install | without_repos | audispd-plugins | Creating temporary directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: pkgs_audispd-plugins_
+      register: tmp_dir
+    
+    - name: Main | install | without_repos | audispd-plugins | Uploading audispd-plugins package
+      when:
+        - ansible_distribution == item.dist
+        - ansible_distribution_release == item.ver 
+      ansible.builtin.copy:
+        src: "files/packages/{{ item.dir_name }}/audispd-plugins/"
+        dest: "{{ tmp_dir.path }}/"
+        mode: '0700'
+      with_items: "{{ packages_dirs.deb }}"
+    
+    - name: Main | install | without_repos | audispd-plugins | Installing packages via apt
+      environment:
+        PATH: /usr/sbin:/sbin:{{ ansible_env.PATH }}
+      ansible.builtin.shell: "/usr/bin/yes | /usr/bin/dpkg --install {{ tmp_dir.path }}/*.deb"
+      ignore_errors: True
+      
+    - name: Main | install | without_repos | audispd-plugins | Cleaning temporary directory
+      ansible.builtin.file:
+        path: "{{ tmp_dir.path }}/"
+        state: absent
+

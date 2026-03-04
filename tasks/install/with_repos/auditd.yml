@@ -1,0 +1,70 @@
+---
+- name: Main | install | with_repos | auditd | Trying to install Auditd 
+  block:
+    - name: Main | install | with_repos | auditd | Trying to install Auditd from repo (Deb-based)
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.apt:
+        name: auditd
+        state: latest
+    
+    - name: Main | install | with_repos | auditd | Trying to install Auditd from repo (RHEL-based)
+      when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+      ansible.builtin.yum:
+        name: audit
+        state: latest
+        
+  rescue:  
+    - name: Main | install | with_repos | auditd | Installing audit without repos
+      when: upload_local_packages 
+      ansible.builtin.include_tasks: install/without_repos/audit.yml
+  
+    - name: Main | install | with_repos | auditd | Fail if package is not available
+      when: not upload_local_packages
+      ansible.builtin.fail:
+        msg: Auditd package is not available in the repositories
+
+- name: Main | install | with_repos | auditd | Getting Auditd version
+  ansible.builtin.shell: out=$(/sbin/auditctl -v) && echo ${out} | /usr/bin/cut --delimiter " " --fields 3
+  register: auditd_installed_ver
+  ignore_errors: yes
+  no_log: yes
+
+- name: Main | install | with_repos | auditd | Reinstalling Auditd to the supported version
+  when:
+    - auditd_installed_ver.stdout <= '2.6'
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_release == 'xenial'
+  block:
+    - name: Main | install | with_repos | auditd | Deleting old Auditd version
+      ansible.builtin.package:
+        name: auditd
+        state: absent
+
+    - name: Main | install | with_repos | auditd | Uploading packages
+      ansible.builtin.copy:
+        src: "files/packages/ubuntu1604/auditd/{{ item }}"
+        dest: "/tmp/{{ item }}"
+        mode: '0700'
+      with_items: "{{ ubuntu1604_auditd_packages }}"
+
+    - name: Main | install | with_repos | auditd | Installing packages via dpkg
+      ansible.builtin.shell: "/usr/bin/dpkg --install /tmp/{{ item }}"
+      with_items: "{{ ubuntu1604_auditd_packages }}"
+
+    - name: Main | install | with_repos | auditd | Cleaning /tmp directory
+      ansible.builtin.file:
+        path: "/tmp/{{ item }}"
+        state: absent
+      with_items: "{{ ubuntu1604_auditd_packages }}"
+
+- name: Main | install | with_repos | auditd | Enabling Auditd service
+  ansible.builtin.service:
+    name: auditd
+    enabled: yes
+
+- ansible.builtin.fail:
+   msg: Auditd version is too old. Install manually a version not older than 2.6.
+  when:
+    - auditd_installed_ver.stdout <='2.6'
+    - not ansible_distribution == 'Ubuntu'
+    - not ansible_distribution_release == 'xenial'

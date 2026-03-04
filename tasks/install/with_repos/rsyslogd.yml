@@ -1,0 +1,41 @@
+---
+- name: Main | install | with_repos | rsyslogd | Trying to install rsyslog
+  block:
+    - name: Main | install | with_repos | rsyslogd | Trying to install rsyslog from repo (Deb-based)
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.apt:
+        name: rsyslog
+        state: latest
+    
+    - name: Main | install | with_repos | rsyslogd | Trying to install rsyslog from repo (RHEL-based)
+      when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+      ansible.builtin.yum:
+        name: rsyslog
+        state: latest
+    
+    - name: Main | install | with_repos | rsyslogd | Trying to install rsyslog from repo (Altlinux)
+      when: ansible_os_family == 'Altlinux'
+      community.general.apt_rpm:
+        name: rsyslog-classic
+        state: present
+        update_cache: yes
+    
+  rescue:
+    - name: Main | install | with_repos | rsyslogd | Installing rsyslog without repos
+      when: upload_local_packages 
+      ansible.builtin.include_tasks: install/without_repos/rsyslog.yml
+  
+    - name: Main | install | with_repos | rsyslogd | Fail if package is not available
+      when: not upload_local_packages 
+      ansible.builtin.fail:
+        msg: rsyslog package is not available in the repositories
+
+- name: Main | install | with_repos | rsyslogd | Enabling rsyslog service
+  ansible.builtin.service:
+    name: rsyslog
+    enabled: yes
+
+- name: Main | install | with_repos | rsyslogd | Starting rsyslog service (with repos)
+  ansible.builtin.service:
+    name: rsyslog
+    state: started

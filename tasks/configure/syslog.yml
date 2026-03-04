@@ -1,0 +1,26 @@
+---
+- name: Main | Configure | syslog | Detecting syslog daemon name
+  ansible.builtin.shell: /usr/bin/pgrep --exact --list-name "{{ syslog_options }}" | /usr/bin/awk '{print $2}'
+  register: syslog_pid_name
+  ignore_errors: yes
+
+- ansible.builtin.set_fact:
+    syslog_name: "{{ syslog_pid_name.stdout }}"
+  when: syslog_pid_name.stdout != ''
+
+- name: Main | Configure | syslog | Installing rsyslog
+  when: syslog_pid_name.stdout == ''
+  block:
+    - name: Starting rsyslog installation
+      ansible.builtin.import_tasks: install/with_repos/rsyslogd.yml
+
+    - ansible.builtin.set_fact:
+        syslog_name: 'rsyslogd'
+
+- name: Main | Configure | syslog | Configuring rsyslog
+  when: syslog_name == 'rsyslogd'
+  ansible.builtin.import_tasks: configure/rsyslogd.yml
+
+- name: Main | Configure | syslog | Configuring syslog-ng
+  when: syslog_name == 'syslog-ng'
+  ansible.builtin.import_tasks: configure/syslog-ng.yml

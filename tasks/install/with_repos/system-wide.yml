@@ -1,0 +1,24 @@
+---
+- name: Main | install | with_repos | system-wide | Trying to install tar
+  block:
+    - name: Main | install | with_repos | system-wide | Trying to install tar from repo (Deb-based)
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.apt:
+        name: tar
+        state: latest
+    
+    - name: Main | install | with_repos | system-wide | Trying to install tar from repo (RHEL-based)
+      when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+      ansible.builtin.yum:
+        name: tar
+        state: latest
+    
+  rescue:
+    - name: Main | install | with_repos | system-wide | Installing misc packages without repos
+      when: upload_local_packages
+      ansible.builtin.include_tasks: install/without_repos/misc.yml
+  
+    - name: Main | install | with_repos | system-wide | Fail if package is not available
+      when: not upload_local_packages
+      ansible.builtin.fail:
+        msg: misc packages is not available in the repositories

@@ -1,0 +1,81 @@
+---
+- name: Main | Configure | rsyslogd | Include agent group config file
+  ansible.builtin.include_vars:
+    file: siem_agents.yml
+
+- name: Main | Configure | rsyslogd | Checking IncludeConfig option
+  ansible.builtin.shell: /bin/grep --silent '^include(file="/etc/rsyslog.d/\*.conf"\|^$IncludeConfig /etc/rsyslog.d/\*.conf' "{{ rsyslog_config }}" && echo true || echo false
+  register: includeconfig_exists
+
+- name: Main | Configure | rsyslogd | Inserting comment
+  ansible.builtin.lineinfile:
+    dest: "{{ rsyslog_config }}"
+    line: '### SIEM directives'
+    insertafter: '[Ww]orkDirectory'
+    state: present
+
+- name: Main | Configure | rsyslogd | Adding IncludeConfig option
+  when: includeconfig_exists.stdout == 'false'
+  ansible.builtin.lineinfile:
+    dest: "{{ rsyslog_config }}"
+    line: $IncludeConfig {{ rsyslog_siem_config }}
+    insertafter: '### SIEM directives'
+    firstmatch: yes
+    state: present
+
+- name: Main | Configure | rsyslogd | Setting up options
+  ansible.builtin.lineinfile:
+    dest: "{{ rsyslog_config }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: '### SIEM directives'
+    state: present
+  with_items: "{{ rsyslog_options }}"
+
+- name: Main | Configure | rsyslogd | Checking if journald is used
+  ansible.builtin.shell: /bin/grep --silent '^module(load="imjournal"\|^$ModLoad imjournal' "{{ rsyslog_config }}" && echo true || echo false
+  register: journald_is_used
+
+
+- name: Main | Configure | rsyslogd | Setting up rsyslog options for journald
+  when: journald_is_used.stdout == 'true'
+  ansible.builtin.lineinfile:
+    dest: "{{ rsyslog_config }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: '### SIEM directives'
+    state: present
+  with_items:
+    - { regexp: '^$imjournalRatelimitBurst', line: '$imjournalRatelimitBurst 20000' }
+    - { regexp: '^$imjournalRatelimitInterval', line: '$imjournalRatelimitInterval 15' }
+
+- name: Main | Configure | rsyslogd | Setting up rsyslog additional options
+  when: journald_is_used.stdout == 'false'
+  ansible.builtin.lineinfile:
+    dest: "{{ rsyslog_config }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: '### SIEM directives'
+    state: present
+  with_items:
+    - { regexp: '^$SystemLogRatelimitBurst', line: '$SystemLogRatelimitBurst 20000' }
+    - { regexp: '^$SystemLogRatelimitInterval', line: '$SystemLogRatelimitInterval 15' }
+
+- name: Main | Configure | rsyslogd | Pushing rsyslog SIEM config
+  ansible.builtin.template:
+    src: rsyslog_10-siem.conf.j2
+    dest: "{{ rsyslog_siem_config }}"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Main | Configure | rsyslogd | Restarting rsyslog service (configure)
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
+
+- name: Main | Configure | rsyslogd | Restarting journald service
+  when: journald_is_used.stdout == 'true' or ansible_os_family == 'Altlinux'
+  ansible.builtin.service:
+    name: systemd-journald
+    state: restarted

@@ -1,0 +1,98 @@
+---
+- name: Main | Configure | auditd | Getting UID_MIN value
+  ansible.builtin.shell: /bin/grep '^UID_MIN' /etc/login.defs | /usr/bin/awk '{print $2}'
+  register: uid_min_value
+
+- name: Main | Configure | auditd | Backing up existing rules
+  ansible.builtin.shell:
+    chdir: "{{ auditd_rules_dir }}"
+    cmd: test -f ./*.rules && /bin/tar --append --file "{{ auditd_rules_bak_name }}" --exclude "'{{ auditd_siem_ruleset }}'" --remove-files ./*.rules || true
+
+- name: Main | Configure | auditd | Pushing Auditd SIEM ruleset
+  ansible.builtin.template:
+    src: auditd_00-siem.rules.j2
+    dest: "{{ auditd_rules_dir }}{{ auditd_siem_ruleset }}"
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    uid_min: "{{ uid_min_value.stdout }}"
+
+- name: Main | Configure | auditd | Checking Auditd ruleset
+  ansible.builtin.shell: /sbin/auditctl -R "{{ auditd_rules_dir }}{{ auditd_siem_ruleset }}"
+
+- name: Main | Configure | auditd | Modifying Auditd config file
+  ansible.builtin.lineinfile:
+    path: "{{ auditd_config }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^log_format', line: 'log_format = ENRICHED' }
+    - { regexp: '^name_format', line: 'name_format = FQD' }
+    - { regexp: '^disp_qos', line: 'disp_qos = lossless' }
+
+- name: Main | Configure | auditd | Checking journald config for AltLinux
+  ansible.builtin.shell: /bin/grep --silent '^\#ForwardToSyslog\|^ForwardToSyslog' "/etc/systemd/journald.conf" && echo true || echo false
+  register: journald_config_exists
+
+- name: Main | Configure | auditd | Modifying journald config for AltLinux
+  when: ansible_os_family == 'Altlinux' and journald_config_exists.stdout == 'true'
+  ansible.builtin.lineinfile:
+    path: "{{ journald_config }}"
+    regexp: '^#?ForwardToSyslog=(yes|no)'
+    line: 'ForwardToSyslog=yes'
+
+- name: Main | Configure | auditd | Disable log writing for highload systems
+  when: not auditd_write_logs
+  ansible.builtin.lineinfile:
+    path: "{{ auditd_config }}"
+    regexp: '^write_logs'
+    line: 'write_logs = no'
+
+- name: Main | Configure | auditd | Disable systemd journal audit socket
+  ansible.builtin.systemd:
+    name: systemd-journald-audit.socket
+    state: 'stopped'
+    enabled: false
+    masked: yes
+  ignore_errors: true
+
+- name: Main | Configure | auditd | Restart systemd journal service
+  ansible.builtin.systemd:
+    name: systemd-journald.service
+    state: 'restarted'
+
+#- name: Main | Configure | auditd | Check RefuseManualStop=yes in auditd.service
+#  ansible.builtin.lineinfile:
+#    path: "{{ auditd_service_path | trim }}"
+#    regexp: '^RefuseManualStop=yes$'
+#    state: absent
+#  register: refuse_manual_stop_present
+
+#- name: Main | Configure | auditd | Disable RefuseManualStop
+#  ansible.builtin.blockinfile:
+#    path: "{{ auditd_service_path | trim }}"
+#    block: |
+#      RefuseManualStop=no
+#    marker: ""
+#    insertafter: '^Conflicts=shutdown.target$'
+#  when: refuse_manual_stop_present.found
+
+#- name: Main | Configure | auditd | Restarting systemd daemon
+#  ansible.builtin.systemd:
+#    daemon_reload: yes
+#  when: refuse_manual_stop_present.found
+
+- name: Main | Configure | auditd | Restarting Auditd service
+  when: ansible_os_family != 'RedHat' and ansible_os_family != 'REDOS' and ansible_os_family != 'RED' and ansible_os_family != 'Altlinux'
+  ansible.builtin.service:
+    name: auditd
+    state: restarted
+
+- name: Main | Configure | auditd | Restarting Auditd service (RHEL-based)
+  when: ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+  ansible.builtin.service: name=auditd state=restarted use=service
+
+- name: RMain | Configure | auditd | estarting Auditd service (Altlinux)
+  when: ansible_os_family == 'Altlinux'
+  ansible.builtin.command: 'service auditd restart'
