@@ -97,8 +97,8 @@ packages_dirs:
     - { dist: 'OracleLinux', ver: '8', dir_name: 'oel8' }
     - { dist: 'RedHat', ver: '7', dir_name: 'rhel7' }
     - { dist: 'RedHat', ver: '8', dir_name: 'rhel8' }
-    - { dist: 'REDOS', ver: '7', dir_name: 'murom7' }
-    - { name: 'RED', min_ver: 7, max_ver: 7 }
+    - { dist: 'REDOS', ver: '7', dir_name: 'redos7' }
+    - { dist: 'RED', ver: '7', dir_name: 'redos7' }
     - { dist: 'Altlinux', ver: '10', dir_name: 'alt10' }
   deb:
     - { dist: 'Debian', ver: 'stretch', dir_name: 'debian9' }

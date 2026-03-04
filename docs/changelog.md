@@ -2,6 +2,20 @@
 
 ## 2026-03-04
 
+### Изменено
+- Запущен цикл исправления P1-замечаний из [docs/CODE_REVIEW.md](./CODE_REVIEW.md):
+  - корректировка mapping офлайн-пакетов для REDOS/RED;
+  - повышение надежности `without_repos` установки с явной валидацией результатов.
+- Исправлен `packages_dirs.rpm` в [vars/main.yml](../vars/main.yml):
+  - `REDOS` переведен на каталог `redos7`;
+  - `RED` переведен на каталог `redos7` с корректной структурой (`dist/ver/dir_name`).
+- В offline-установках убраны "тихие" ошибки и добавлены post-check:
+  - [tasks/install/without_repos/audit.yml](../tasks/install/without_repos/audit.yml)
+  - [tasks/install/without_repos/audispd-plugins.yml](../tasks/install/without_repos/audispd-plugins.yml)
+  - [tasks/install/without_repos/rsyslog.yml](../tasks/install/without_repos/rsyslog.yml)
+  - [tasks/install/without_repos/misc.yml](../tasks/install/without_repos/misc.yml)
+- Добавлены валидации бинарников после установки (`auditctl -v`, `rsyslogd -v`, `tar --version`).
+
 ### Добавлено
 - Создан [README.md](../README.md) с:
   - назначением роли;

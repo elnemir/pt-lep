@@ -20,7 +20,6 @@
     
     - name: Main | install | without_repos | misc | Installing packages via rpm
       ansible.builtin.shell: "/usr/bin/yum -y install {{ tmp_dir.path }}/*.rpm"
-      ignore_errors: True
       
     - name: Main | install | without_repos | misc | Cleaning temporary directory
       ansible.builtin.file:
@@ -50,10 +49,25 @@
       environment:
         PATH: /usr/sbin:/sbin:{{ ansible_env.PATH }}
       ansible.builtin.shell: "/usr/bin/yes | /usr/bin/dpkg --install {{ tmp_dir.path }}/*.deb"
-      ignore_errors: True
       
     - name: Main | install | without_repos | misc | Cleaning temporary directory
       ansible.builtin.file:
         path: "{{ tmp_dir.path }}/"
         state: absent
 
+- name: Main | install | without_repos | misc | Gathering package facts
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Main | install | without_repos | misc | Verifying tar package installation
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+  ansible.builtin.assert:
+    that:
+      - "'tar' in ansible_facts.packages"
+    fail_msg: Failed to install tar package from local repository.
+
+- name: Main | install | without_repos | misc | Checking tar version
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat' or ansible_os_family == 'REDOS' or ansible_os_family == 'RED'
+  ansible.builtin.command: /bin/tar --version
+  changed_when: false

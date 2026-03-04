@@ -32,3 +32,44 @@
 - **Общий статус задачи**: Завершена
 - **Оставшиеся шаги**:
   - Решение пользователя о приоритете исправления найденных дефектов (см. [docs/CODE_REVIEW.md](./CODE_REVIEW.md)).
+
+---
+
+## Задача: Исправление P1 замечаний из Code Review
+- **Статус**: Завершена
+- **Описание**: Устранить P1-риски из [docs/CODE_REVIEW.md](./CODE_REVIEW.md): mapping офлайн-пакетов REDOS/RED и надежность `without_repos` установки.
+
+### Шаг 1. Подготовка и фиксация плана
+- **Статус**: Завершена
+- **Описание**:
+  - Подтверждено выполнение P1-пакета изменений.
+  - Определены целевые файлы: `vars/main.yml`, `tasks/install/without_repos/{audit,audispd-plugins,rsyslog}.yml`.
+
+### Шаг 2. Исправление mapping пакетов REDOS/RED
+- **Статус**: Завершена
+- **Описание**:
+  - Обновлен `packages_dirs.rpm` в `vars/main.yml`:
+    - `REDOS -> redos7`;
+    - `RED -> redos7`.
+
+### Шаг 3. Повышение надежности offline установки
+- **Статус**: Завершена
+- **Описание**:
+  - Удалены `ignore_errors: True` из offline-установок:
+    - `tasks/install/without_repos/audit.yml`
+    - `tasks/install/without_repos/audispd-plugins.yml`
+    - `tasks/install/without_repos/rsyslog.yml`
+    - `tasks/install/without_repos/misc.yml`
+  - Добавлены post-install проверки через `package_facts` + `assert`.
+  - Добавлены runtime проверки бинарников (`auditctl -v`, `rsyslogd -v`, `tar --version`).
+
+### Шаг 4. Валидация и финализация
+- **Статус**: Завершена
+- **Описание**:
+  - Выполнена быстрая проверка изменений и диффов.
+  - Попытка `ansible-playbook --syntax-check` не выполнена из-за отсутствия `ansible-playbook` в окружении.
+
+### Текущий статус
+- **Общий статус задачи**: Завершена
+- **Оставшиеся шаги**:
+  - По запросу: перейти к P2-исправлениям из [docs/CODE_REVIEW.md](./CODE_REVIEW.md).

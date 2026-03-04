@@ -17,3 +17,11 @@
   - [docs/changelog.md](docs/changelog.md)
   - [docs/tasktracker.md](docs/tasktracker.md)
 
+### Fixed
+- Исправлен mapping офлайн-пакетов для `REDOS`/`RED` в [vars/main.yml](vars/main.yml).
+- Устранено скрытие ошибок в offline-установках:
+  - [tasks/install/without_repos/audit.yml](tasks/install/without_repos/audit.yml)
+  - [tasks/install/without_repos/audispd-plugins.yml](tasks/install/without_repos/audispd-plugins.yml)
+  - [tasks/install/without_repos/rsyslog.yml](tasks/install/without_repos/rsyslog.yml)
+  - [tasks/install/without_repos/misc.yml](tasks/install/without_repos/misc.yml)
+- Добавлены post-install проверки пакетов и проверка доступности бинарников в offline-ветках установки.
