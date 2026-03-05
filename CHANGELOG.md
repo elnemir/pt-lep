@@ -64,4 +64,7 @@
   - CentOS `10 -> centos10`,
   - REDOS/RED `8 -> redos8`,
   - REDOS/RED `9 -> redos9`.
+- Расширена поддержка AstraLinux:
+  - `linux_supported`: `Astra Linux 1..2`;
+  - оффлайн mapping для релизов `1.5/1.6/1.7/1.8/2.12` (через `astra17` и Debian-совместимые bundles).
 - Добавлен `.gitignore` для исключения служебных файлов (`.DS_Store`) и Python-кэша (`__pycache__`).

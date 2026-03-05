@@ -75,7 +75,7 @@ linux_supported:
   - { name: 'OracleLinux', min_ver: 7, max_ver: 9 }
   - { name: 'Debian', min_ver: 6, max_ver: 13 }
   - { name: 'Ubuntu', min_ver: 16, max_ver: 24 }
-  - { name: 'Astra Linux', min_ver: 1, max_ver: 1 }
+  - { name: 'Astra Linux', min_ver: 1, max_ver: 2 }
   - { name: 'REDOS', min_ver: 7, max_ver: 9 }
   - { name: 'RED', min_ver: 7, max_ver: 9 }
   - { name: 'Altlinux', min_ver: 10, max_ver: 10 }
@@ -122,4 +122,15 @@ packages_dirs:
     - { dist: 'Ubuntu', ver: 'focal', dir_name: 'ubuntu2004' }
     - { dist: 'Ubuntu', ver: 'jammy', dir_name: 'ubuntu2204' }
     - { dist: 'Ubuntu', ver: 'noble', dir_name: 'ubuntu2404' }
+    - { dist: 'Astra Linux', ver: '1.5', dir_name: 'astra15' }
+    - { dist: 'Astra Linux', ver: '1.5_x86-64', dir_name: 'astra15' }
+    - { dist: 'Astra Linux', ver: '1.6', dir_name: 'astra16' }
+    - { dist: 'Astra Linux', ver: '1.6_x86-64', dir_name: 'astra16' }
+    - { dist: 'Astra Linux', ver: '1.7', dir_name: 'astra17' }
     - { dist: 'Astra Linux', ver: '1.7_x86-64', dir_name: 'astra17' }
+    - { dist: 'Astra Linux', ver: '1.8', dir_name: 'astra18' }
+    - { dist: 'Astra Linux', ver: '1.8_x86-64', dir_name: 'astra18' }
+    - { dist: 'Astra Linux', ver: '1.11', dir_name: 'astra111' }
+    - { dist: 'Astra Linux', ver: '1.11_x86-64-ce', dir_name: 'astra111' }
+    - { dist: 'Astra Linux', ver: '2.12', dir_name: 'astra212' }
+    - { dist: 'Astra Linux', ver: '2.12_x86-64', dir_name: 'astra212' }

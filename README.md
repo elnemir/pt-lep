@@ -75,7 +75,7 @@ ansible-playbook playbook.yml --tags "install,auditd"
 - OracleLinux 7-9;
 - Debian 6-13;
 - Ubuntu 16-24;
-- Astra Linux 1.7;
+- Astra Linux 1.x-2.x;
 - REDOS 7-9;
 - RED 7-9;
 - Altlinux 10.

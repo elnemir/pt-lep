@@ -29,6 +29,9 @@
   - [CHANGELOG.md](../CHANGELOG.md).
 - Добавлен [.gitignore](../.gitignore):
   - исключены `.DS_Store` и `__pycache__` для предотвращения повторного попадания служебных файлов в git-статус.
+- Расширена поддержка AstraLinux:
+  - в [vars/main.yml](../vars/main.yml) `linux_supported` обновлен до `Astra Linux 1..2`;
+  - добавлен оффлайн mapping для релизов `1.5/1.6/1.7/1.8/2.12` с compatibility-привязкой к существующим bundles (`astra17`, `debian9`, `debian12`).
 
 ## 2026-03-04
 

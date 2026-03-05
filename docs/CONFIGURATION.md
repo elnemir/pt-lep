@@ -76,7 +76,7 @@ facilities:
 - OracleLinux 7-9
 - Debian 6-13
 - Ubuntu 16-24
-- Astra Linux 1
+- Astra Linux 1-2
 - REDOS 7-9
 - RED 7-9
 - Altlinux 10
@@ -87,6 +87,9 @@ facilities:
   - CentOS `7..10`,
   - REDOS/RED `7..9`.
 - Для REDOS/RED `7..9` используются совместимые CentOS-бандлы (alias-каталоги `redos7/8/9`).
+- Для AstraLinux оффлайн-мэппинг расширен на основные релизы `1.5/1.6/1.7/1.8/2.12`:
+  - `1.7` использует `astra17` bundle;
+  - другие релизы используют Debian-совместимые bundles (`debian9`/`debian12`) в режиме compatibility.
 - Для других supported ОС и версий, не имеющих локального mapping, роль требует установку из репозиториев или добавление собственных локальных пакетов.
 
 ## 7. Переопределение переменных
