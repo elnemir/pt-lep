@@ -16,6 +16,15 @@
   - [docs/CODE_REVIEW.md](docs/CODE_REVIEW.md)
   - [docs/changelog.md](docs/changelog.md)
   - [docs/tasktracker.md](docs/tasktracker.md)
+- Добавлен универсальный RPM-загрузчик оффлайн-бандлов: [scripts/fetch_rpm_offline.py](scripts/fetch_rpm_offline.py).
+- Расширен Debian-загрузчик оффлайн-бандлов до `debian13` и параметризован выбором релизов:
+  - [scripts/fetch_debian_legacy_offline.py](scripts/fetch_debian_legacy_offline.py).
+- Добавлены оффлайн-бандлы пакетов:
+  - `debian13`,
+  - `centos9`,
+  - `centos10`,
+  - `redos8`,
+  - `redos9`.
 
 ### Fixed
 - Исправлен mapping офлайн-пакетов для `REDOS`/`RED` в [vars/main.yml](vars/main.yml).
@@ -49,3 +58,10 @@
   - `debian8 (jessie)`.
 - Добавлен скрипт автоматической выгрузки legacy Debian пакетов: [scripts/fetch_debian_legacy_offline.py](scripts/fetch_debian_legacy_offline.py).
 - Добавлены mapping-записи для legacy Debian в [vars/main.yml](vars/main.yml): `squeeze/wheezy/jessie`.
+- Добавлены mapping-записи для offline-установки:
+  - Debian `trixie -> debian13`,
+  - CentOS `9 -> centos9`,
+  - CentOS `10 -> centos10`,
+  - REDOS/RED `8 -> redos8`,
+  - REDOS/RED `9 -> redos9`.
+- Добавлен `.gitignore` для исключения служебных файлов (`.DS_Store`) и Python-кэша (`__pycache__`).

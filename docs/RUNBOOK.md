@@ -29,6 +29,18 @@ ansible-playbook playbook.yml --check
 ansible-playbook playbook.yml --tags configure
 ```
 
+## 2.1 Подготовка полностью закрытого контура (offline bundles)
+
+На хосте с доступом в интернет выполните:
+
+```bash
+python3 scripts/fetch_debian_legacy_offline.py --releases all
+python3 -u scripts/fetch_rpm_offline.py --releases centos7,centos8,centos9,centos10,redos7,redos8,redos9
+```
+
+После выгрузки перенесите каталог `files/packages/` в закрытый контур вместе с ролью.
+Примечание: для `REDOS/RED 7..9` используются совместимые CentOS-бандлы.
+
 ## 3. Пост-проверки на хосте
 
 ### Проверка сервисов
@@ -72,8 +84,8 @@ grep -n "10-siem.conf" /etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/10-siem.conf
 - Проверить, что каталог пакетов для вашей ОС существует в `files/packages/`.
 
 ### Не определяется syslog-демон
-- Логика завязана на запущенный процесс (`pgrep rsyslog|syslog-ng`).
-- Если демон установлен, но не запущен, роль может выбрать установку `rsyslog`.
+- Логика использует `service_facts` и анализ установленных unit-файлов (`rsyslog`/`syslog-ng`).
+- Если ни один daemon не обнаружен, роль ставит `rsyslog`.
 
 ## 5. Откат
 

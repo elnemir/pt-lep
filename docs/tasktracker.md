@@ -251,3 +251,55 @@
 - **Общий статус задачи**: Завершена
 - **Оставшиеся шаги**:
   - По запросу: аналогично собрать offline-наборы для Debian 13 и/или RHEL-like `9/10`.
+
+---
+
+## Задача: Fully-offline поддержка для Debian 13, CentOS 7..10 и REDOS 7..9
+- **Статус**: Завершена
+- **Описание**: Подготовить полный набор оффлайн-пакетов для актуальных Debian и всех целевых CentOS/REDOS сценариев, пригодный для запуска в полностью закрытом контуре.
+
+### Шаг 1. Подготовка и анализ пробелов
+- **Статус**: Завершена
+- **Описание**:
+  - Проверено текущее покрытие `files/packages`: отсутствовали `debian13`, `centos9`, `centos10`, `redos8`, `redos9`.
+  - Подтверждена доступность Debian/CentOS репозиториев для выгрузки пакетов.
+
+### Шаг 2. Реализация инструментов выгрузки
+- **Статус**: Завершена
+- **Описание**:
+  - Обновлен [scripts/fetch_debian_legacy_offline.py](../scripts/fetch_debian_legacy_offline.py):
+    - поддержка расширена до `debian13`;
+    - добавлен параметр `--releases`.
+  - Добавлен [scripts/fetch_rpm_offline.py](../scripts/fetch_rpm_offline.py):
+    - разбор `repodata/primary` и расчет closure зависимостей;
+    - загрузка RPM-наборов для `centos7..10`;
+    - формирование `redos7..9` как alias-наборов.
+
+### Шаг 3. Выгрузка пакетов и обновление mapping
+- **Статус**: Завершена
+- **Описание**:
+  - Выполнена выгрузка `.deb` в `files/packages/debian13/{auditd,audispd-plugins,rsyslog,misc}`.
+  - Выполнена выгрузка `.rpm` в `files/packages/centos{7,8,9,10}/{audit,audispd-plugins,rsyslog,misc}`.
+  - Сформированы alias-каталоги `files/packages/redos{7,8,9}/...`.
+  - В [vars/main.yml](../vars/main.yml) добавлены mapping записи для:
+    - `Debian trixie -> debian13`,
+    - `CentOS 9/10 -> centos9/centos10`,
+    - `REDOS/RED 8/9 -> redos8/redos9`.
+
+### Шаг 4. Документация и валидация
+- **Статус**: Завершена
+- **Описание**:
+  - Актуализированы [README.md](../README.md), [docs/CONFIGURATION.md](./CONFIGURATION.md), [docs/RUNBOOK.md](./RUNBOOK.md), [docs/PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md), [CHANGELOG.md](../CHANGELOG.md), [docs/changelog.md](./changelog.md).
+  - Выполнена валидация скриптов: `python3 -m py_compile scripts/fetch_debian_legacy_offline.py scripts/fetch_rpm_offline.py`.
+  - `ansible-playbook --syntax-check` не запускался: отсутствует `ansible-playbook` в окружении.
+
+### Шаг 5. Git hygiene для служебных файлов
+- **Статус**: Завершена
+- **Описание**:
+  - Добавлен [.gitignore](../.gitignore) с правилами для `.DS_Store` и `__pycache__`.
+  - Удалены уже попавшие в git служебные файлы `.DS_Store` из `files/` и `files/packages/`.
+
+### Текущий статус
+- **Общий статус задачи**: Завершена
+- **Оставшиеся шаги**:
+  - По запросу: добавить отдельные native-REDOS источники в загрузчик при доступности внутреннего mirror RedOS.

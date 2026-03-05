@@ -106,6 +106,12 @@ ansible-playbook playbook.yml --tags "install,auditd"
 
 - [inventory/hosts](inventory/hosts) в репозитории является sanitized-шаблоном. Для реального контура используйте отдельный приватный inventory-файл.
 - В [vars/siem_agents.yml](vars/siem_agents.yml) по умолчанию указан placeholder (`mpxagent01.example.com`), задайте реальные адреса SIEM-агентов перед production-запуском.
-- Офлайн-пакеты (`files/packages`) подготовлены для Debian `6..12`; для Debian 13 и части RHEL-like новых версий используйте репозиторный режим установки или добавьте локальные пакеты.
+- Офлайн-пакеты (`files/packages`) подготовлены для:
+  - Debian `6..13` (native `.deb` bundles),
+  - CentOS `7..10` (native `.rpm` bundles),
+  - REDOS/RED `7..9` (совместимые RPM-наборы, собранные из CentOS-бандлов).
+- Для актуализации оффлайн-бандлов используйте:
+  - `python3 scripts/fetch_debian_legacy_offline.py --releases all`
+  - `python3 -u scripts/fetch_rpm_offline.py --releases centos7,centos8,centos9,centos10,redos7,redos8,redos9`
 - `ansible.cfg` задает `roles_path = ../`; для запуска убедитесь, что имя роли и путь в окружении соответствуют этому layout.
 - Перед запуском в production проверьте раздел "Риски и техдолг" в [docs/PROJECT_ANALYSIS.md](docs/PROJECT_ANALYSIS.md).

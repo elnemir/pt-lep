@@ -90,17 +90,23 @@ ubuntu1604_auditd_packages:
 
 
 packages_dirs:
-  # Offline packages are available for a subset of supported OS versions.
+  # Offline packages are prepared for all supported Debian/CentOS/REDOS versions.
   # For other supported versions use repository installation mode.
   rpm:
     - { dist: 'CentOS', ver: '7', dir_name: 'centos7' }
     - { dist: 'CentOS', ver: '8', dir_name: 'centos8' }
+    - { dist: 'CentOS', ver: '9', dir_name: 'centos9' }
+    - { dist: 'CentOS', ver: '10', dir_name: 'centos10' }
     - { dist: 'OracleLinux', ver: '7', dir_name: 'oel7' }
     - { dist: 'OracleLinux', ver: '8', dir_name: 'oel8' }
     - { dist: 'RedHat', ver: '7', dir_name: 'rhel7' }
     - { dist: 'RedHat', ver: '8', dir_name: 'rhel8' }
     - { dist: 'REDOS', ver: '7', dir_name: 'redos7' }
+    - { dist: 'REDOS', ver: '8', dir_name: 'redos8' }
+    - { dist: 'REDOS', ver: '9', dir_name: 'redos9' }
     - { dist: 'RED', ver: '7', dir_name: 'redos7' }
+    - { dist: 'RED', ver: '8', dir_name: 'redos8' }
+    - { dist: 'RED', ver: '9', dir_name: 'redos9' }
     - { dist: 'Altlinux', ver: '10', dir_name: 'alt10' }
   deb:
     - { dist: 'Debian', ver: 'squeeze', dir_name: 'debian6' }
@@ -110,6 +116,7 @@ packages_dirs:
     - { dist: 'Debian', ver: 'buster', dir_name: 'debian10' }
     - { dist: 'Debian', ver: 'bullseye', dir_name: 'debian11' }
     - { dist: 'Debian', ver: 'bookworm', dir_name: 'debian12' }
+    - { dist: 'Debian', ver: 'trixie', dir_name: 'debian13' }
     - { dist: 'Ubuntu', ver: 'xenial', dir_name: 'ubuntu1604' }
     - { dist: 'Ubuntu', ver: 'bionic', dir_name: 'ubuntu1804' }
     - { dist: 'Ubuntu', ver: 'focal', dir_name: 'ubuntu2004' }

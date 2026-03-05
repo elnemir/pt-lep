@@ -1,5 +1,35 @@
 # Журнал изменений документации
 
+## 2026-03-05
+
+### Изменено
+- Запущен цикл подготовки fully-offline контуров для актуальных Debian и всех целевых CentOS/REDOS:
+  - Debian `13` (`trixie`);
+  - CentOS `7..10`;
+  - REDOS/RED `7..9`.
+- Реализовано расширение offline-поддержки:
+  - в [vars/main.yml](../vars/main.yml) добавлены mapping записи:
+    - `trixie -> debian13`,
+    - `CentOS 9 -> centos9`,
+    - `CentOS 10 -> centos10`,
+    - `REDOS/RED 8 -> redos8`,
+    - `REDOS/RED 9 -> redos9`;
+  - обновлен скрипт [scripts/fetch_debian_legacy_offline.py](../scripts/fetch_debian_legacy_offline.py):
+    - теперь поддерживает `debian6..debian13`;
+    - добавлен параметр `--releases`;
+  - добавлен [scripts/fetch_rpm_offline.py](../scripts/fetch_rpm_offline.py):
+    - автоматический резолв RPM-зависимостей по metadata;
+    - выгрузка для `centos7..10`;
+    - формирование `redos7..9` как совместимых alias-наборов.
+- Актуализирована эксплуатационная документация:
+  - [README.md](../README.md),
+  - [docs/CONFIGURATION.md](./CONFIGURATION.md),
+  - [docs/RUNBOOK.md](./RUNBOOK.md),
+  - [docs/PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md),
+  - [CHANGELOG.md](../CHANGELOG.md).
+- Добавлен [.gitignore](../.gitignore):
+  - исключены `.DS_Store` и `__pycache__` для предотвращения повторного попадания служебных файлов в git-статус.
+
 ## 2026-03-04
 
 ### Изменено
