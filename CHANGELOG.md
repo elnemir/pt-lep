@@ -35,9 +35,17 @@
   - [tasks/configure/auditd.yml](tasks/configure/auditd.yml) (исправлена опечатка в task name)
   - [tasks/configure/rsyslogd.yml](tasks/configure/rsyslogd.yml) (упрощены grep-checks без shell-конвейеров)
 - Расширена матрица поддерживаемых ОС:
-  - RedHat/CentOS/OracleLinux `7..9`
-  - Debian `6..12`
+  - RedHat `7..9`
+  - CentOS `7..10`
+  - OracleLinux `7..9`
+  - Debian `6..13`
   - REDOS/RED `7..9`
   (см. [vars/main.yml](vars/main.yml))
 - Для RHEL-like в `with_repos`-ветках установка переведена на `ansible.builtin.package` для совместимости с современными менеджерами пакетов.
 - Для `without_repos`-веток добавлены явные проверки availability локальных пакетов и RPM-установка с авто-выбором `dnf/yum`.
+- Добавлены офлайн-наборы пакетов для устаревших Debian:
+  - `debian6 (squeeze)`,
+  - `debian7 (wheezy)`,
+  - `debian8 (jessie)`.
+- Добавлен скрипт автоматической выгрузки legacy Debian пакетов: [scripts/fetch_debian_legacy_offline.py](scripts/fetch_debian_legacy_offline.py).
+- Добавлены mapping-записи для legacy Debian в [vars/main.yml](vars/main.yml): `squeeze/wheezy/jessie`.

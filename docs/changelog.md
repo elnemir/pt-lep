@@ -3,6 +3,25 @@
 ## 2026-03-04
 
 ### Изменено
+- Запущен цикл добавления офлайн-пакетов для устаревших Debian-релизов:
+  - `debian6 (squeeze)`,
+  - `debian7 (wheezy)`,
+  - `debian8 (jessie)`.
+- Реализовано добавление офлайн-пакетов для устаревших Debian:
+  - добавлен скрипт [scripts/fetch_debian_legacy_offline.py](../scripts/fetch_debian_legacy_offline.py) для автоматической выгрузки;
+  - добавлены наборы `.deb` (с зависимостями) для `debian6`, `debian7`, `debian8` по компонентам `auditd`, `audispd-plugins`, `rsyslog`, `misc`;
+  - в [vars/main.yml](../vars/main.yml) добавлены mapping записи:
+    - `squeeze -> debian6`,
+    - `wheezy -> debian7`,
+    - `jessie -> debian8`.
+- Запущен цикл точечного расширения поддержки ОС:
+  - Debian до версии 13;
+  - CentOS до версии 10.
+- Реализовано точечное расширение поддержки ОС:
+  - в [vars/main.yml](../vars/main.yml) обновлен `linux_supported`:
+    - Debian `6..13`;
+    - CentOS `7..10`.
+  - обновлены диапазоны в [README.md](../README.md) и [docs/CONFIGURATION.md](./CONFIGURATION.md).
 - Запущен цикл расширения поддержки ОС:
   - поддержка Debian начиная с 6.x;
   - поддержка REDOS/RED до 9.x;

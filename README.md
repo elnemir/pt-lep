@@ -70,8 +70,10 @@ ansible-playbook playbook.yml --tags "install,auditd"
 ## 4. Поддерживаемые ОС
 
 Роль ориентирована на:
-- RedHat/CentOS/OracleLinux 7-9;
-- Debian 6-12;
+- RedHat 7-9;
+- CentOS 7-10;
+- OracleLinux 7-9;
+- Debian 6-13;
 - Ubuntu 16-24;
 - Astra Linux 1.7;
 - REDOS 7-9;
@@ -104,6 +106,6 @@ ansible-playbook playbook.yml --tags "install,auditd"
 
 - [inventory/hosts](inventory/hosts) в репозитории является sanitized-шаблоном. Для реального контура используйте отдельный приватный inventory-файл.
 - В [vars/siem_agents.yml](vars/siem_agents.yml) по умолчанию указан placeholder (`mpxagent01.example.com`), задайте реальные адреса SIEM-агентов перед production-запуском.
-- Офлайн-пакеты (`files/packages`) доступны только для части версий ОС; для остальных поддерживаемых версий используйте репозиторный режим установки.
+- Офлайн-пакеты (`files/packages`) подготовлены для Debian `6..12`; для Debian 13 и части RHEL-like новых версий используйте репозиторный режим установки или добавьте локальные пакеты.
 - `ansible.cfg` задает `roles_path = ../`; для запуска убедитесь, что имя роли и путь в окружении соответствуют этому layout.
 - Перед запуском в production проверьте раздел "Риски и техдолг" в [docs/PROJECT_ANALYSIS.md](docs/PROJECT_ANALYSIS.md).

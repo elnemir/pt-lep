@@ -30,9 +30,10 @@
 5. Inventory санитизирован до безопасного шаблона без внутренних адресов.
 6. Default SIEM endpoint в репозитории заменен на placeholder.
 7. Закрыты мелкие quality-замечания (`task name typo`, shell-конвейеры в grep-checks).
-8. Расширена матрица поддержки ОС: RedHat/CentOS/OracleLinux `7..9`, Debian `6..12`, REDOS/RED `7..9`.
+8. Расширена матрица поддержки ОС: RedHat `7..9`, CentOS `7..10`, OracleLinux `7..9`, Debian `6..13`, REDOS/RED `7..9`.
 9. Режим установки `with_repos` для RHEL-like переведен на package-agnostic подход.
 10. В `without_repos` добавлена явная проверка наличия mapping и локальных пакетов для текущей версии ОС.
+11. Добавлены офлайн-наборы пакетов для устаревших Debian (`6/7/8`) и включены соответствующие mapping записи.
 
 ### Приоритет P2 (актуальный)
 1. Вынести повторяющуюся install-логику в reusable include/role helpers.

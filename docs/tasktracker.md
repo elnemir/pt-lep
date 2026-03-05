@@ -190,3 +190,64 @@
 - **Общий статус задачи**: Завершена
 - **Оставшиеся шаги**:
   - По запросу: добавить CI-проверки (`ansible-lint`, syntax-check, smoke inventory).
+
+---
+
+## Задача: Расширение поддержки до Debian 13 и CentOS 10
+- **Статус**: Завершена
+- **Описание**: Обновить supported matrix для Debian и CentOS, сохранив явную модель fallback для offline-режима.
+
+### Шаг 1. Подготовка
+- **Статус**: Завершена
+- **Описание**:
+  - Определен целевой scope: `linux_supported`, эксплуатационная документация.
+  - Подтверждено, что offline-пакеты для Debian 13 / CentOS 10 в репозитории отсутствуют, поэтому поддержка для них остается repo-first.
+
+### Шаг 2. Реализация
+- **Статус**: Завершена
+- **Описание**:
+  - В [vars/main.yml](../vars/main.yml) обновлен `linux_supported`:
+    - Debian `6..13`;
+    - CentOS `7..10`.
+  - Обновлены диапазоны в [README.md](../README.md), [docs/CONFIGURATION.md](./CONFIGURATION.md), [CHANGELOG.md](../CHANGELOG.md), [docs/PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md).
+
+### Шаг 3. Валидация
+- **Статус**: Завершена
+- **Описание**:
+  - Проверены итоговые диапазоны в коде и документации.
+  - `ansible-playbook --syntax-check` не запускался: в окружении отсутствует `ansible-playbook`.
+
+### Текущий статус
+- **Общий статус задачи**: Завершена
+- **Оставшиеся шаги**:
+  - По запросу: добавить offline-пакеты для Debian 13 и CentOS 10 либо оставить их в repo-only режиме.
+
+---
+
+## Задача: Добавление офлайн-пакетов для устаревших Debian
+- **Статус**: Завершена
+- **Описание**: Сформировать и добавить offline-наборы `.deb` для устаревших Debian-релизов (squeeze/wheezy/jessie) по пакетам `auditd`, `audispd-plugins`, `rsyslog`, `tar` с транзитивными зависимостями.
+
+### Шаг 1. Подготовка
+- **Статус**: Завершена
+- **Описание**:
+  - Подтвержден доступ к `archive.debian.org`.
+  - Подтверждено отсутствие локальных наборов `debian6`, `debian7`, `debian8` в `files/packages`.
+
+### Шаг 2. Сборка наборов пакетов
+- **Статус**: Завершена
+- **Описание**:
+  - Добавлен вспомогательный скрипт [scripts/fetch_debian_legacy_offline.py](../scripts/fetch_debian_legacy_offline.py) для автоматической выгрузки legacy Debian пакетов.
+  - Выполнена автоматическая выгрузка `.deb` и зависимостей в структуру `files/packages/debian{6,7,8}/{auditd,audispd-plugins,rsyslog,misc}`.
+  - Добавлены offline-mapping записи для `squeeze/wheezy/jessie` в [vars/main.yml](../vars/main.yml).
+
+### Шаг 3. Валидация и документация
+- **Статус**: Завершена
+- **Описание**:
+  - Проверены объемы и состав выгруженных наборов (`debian6`: 53M, `debian7`: 58M, `debian8`: 50M).
+  - Обновлены [README.md](../README.md), [docs/CONFIGURATION.md](./CONFIGURATION.md), [CHANGELOG.md](../CHANGELOG.md), [docs/changelog.md](./changelog.md), [docs/PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md).
+
+### Текущий статус
+- **Общий статус задачи**: Завершена
+- **Оставшиеся шаги**:
+  - По запросу: аналогично собрать offline-наборы для Debian 13 и/или RHEL-like `9/10`.
